@@ -56,17 +56,14 @@ var login = {
 		async.waterfall(
 		[
 			function(callback){
-				User.findOne({$or: [{email:request.payload.id},{username:request.payload.id}]},function(err,user){
+				User.findOne({$or: [{email:request.payload.id},{username:request.payload.id}]}
+									, function(err,user){
 			
 					if(err)
 						throw err;
 					if(!user)
 					{
 						callback(null,200);
-						/*reply({
-							statuscode:200,
-							message:'User not found'
-						});*/
 					}
 					else{
 						callback(null, user);
@@ -99,8 +96,8 @@ var login = {
 				reply({
 							statusCode:200,
 							message:'Login Successful',
-							result:res
-							//data:"Welcome "+request.payload.id
+							result:res,
+							data:"Welcome "+request.payload.id
 						});
 				}
 			else{
