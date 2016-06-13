@@ -1,0 +1,27 @@
+{
+  "name": "aman",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "bcrypt": "^0.8.6",
+    "good": "^7.0.1",
+    "good-console": "^6.1.2",
+    "good-squeeze": "^3.0.1",
+    "hapi": "^13.4.1",
+    "hapi-swagger": "^6.1.0",
+    "inert": "^4.0.0",
+    "joi": "^8.4.2",
+    "log4js": "^0.6.36",
+    "moment": "^2.13.0",
+    "moment-timezone": "^0.5.4",
+    "mongoose": "^4.4.20",
+    "vision": "^4.1.0"
+  }
+}
