@@ -84,7 +84,7 @@ var login = {
 						callback(null, isMatch);
 					}
 					else{
-						callback(null, isMatch);
+						callback(null, 'false');
 					}
 				}
 				);
@@ -92,7 +92,7 @@ var login = {
 			
 			}
 		], function(err,res){
-			if(res){
+			if(res != 'false'){
 				reply({
 							statusCode:200,
 							message:'Login Successful',
