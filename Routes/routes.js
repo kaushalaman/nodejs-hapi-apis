@@ -63,7 +63,7 @@ var login = {
 						throw err;
 					if(!user)
 					{
-						callback(null,200);
+						callback(null,2);
 					}
 					else{
 						callback(null, user);
@@ -72,8 +72,8 @@ var login = {
 				});
 			},
 			function(arg,callback){
-				if(arg===200){
-					callback(null, 'User not found');
+				if(arg===2){
+					callback(null, 2);
 				}
 				else{
 					arg.comparePassword(request.payload.password,function(err,isMatch){
@@ -92,7 +92,10 @@ var login = {
 			
 			}
 		], function(err,res){
-			if(res != 'false'){
+			if(res===2){
+				reply({data:"User not found"});
+			}
+			else if(res==true){
 				reply({
 							statusCode:200,
 							message:'Login Successful',
@@ -100,7 +103,9 @@ var login = {
 							data:"Welcome "+request.payload.id
 						});
 				}
-			else{
+			
+			else if(res == 'false')
+			{
 				reply({
 							message:'Login Failed',
 							result:res,
