@@ -11,8 +11,11 @@ const DATABASE =  {
 	port:27017
 };
 
+const key = 'secretkey';
+
 module.exports = {
 	PORT : PORT,
 	HOST : HOST,
-	DATABASE : DATABASE
+	DATABASE : DATABASE,
+	key : key
 };

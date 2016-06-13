@@ -5,14 +5,18 @@ const Joi = require('joi');
 const CONFIG = require('../Config');
 const constants = CONFIG.CONSTANTS;
 const User = require('../Models/userschema');
+const Tweet = require('../Models/tweetschema');
 const async = require('async');
+const Plugins = require('../Plugins');
+
 var get = {
 	method:'GET',
 	path:'/twitter/api/',
 	config:{
 	tags:['api'],
 	description:'Get all users',
-	notes:'Get all users'
+	notes:'Get all users',
+	auth:'token'
     },
 	handler:function(request,reply){
 		async.waterfall([
@@ -128,8 +132,8 @@ var register = {
 	validate:{
 		payload:{
 			Name:Joi.string().required(),
-			email:Joi.string().required(),
-			username:Joi.string().required(),
+			email:Joi.string().email().required(),
+			username:Joi.string().alphanum().min(4).max(30).required(),
 			password:Joi.string().required(),
 			contact:Joi.string().required(),
 			age: Joi.number().required(),
@@ -212,7 +216,36 @@ var deletes = {
 		});
 	}
 	
-}
+};
+
+/*var tweet = {
+	method: 'POST',
+	path:'/twitter/api/post',
+	config:{
+		tags:['api'],
+		description:'Post tweet',
+		notes:'Post Tweet',
+		validate:{
+			payload:{
+				text: Joi.string().required(),
+				id: Joi.number(),
+				username : Joi.string(),
+				name : Joi.string()
+			}
+		}
+	},
+	handler : function(request, reply){
+		let tweet = new Tweet({
+			tweet:request.payload.text,
+			tweet_id:request.payload.id,
+			username:request.payload.username,
+			name: request.payload.name
+		});
+		tweet.save(tweet, function(err,res){
+
+		})
+	}
+} */
 
 module.exports = [
 	get,
@@ -220,5 +253,6 @@ module.exports = [
 	register,
 	logout,
 	deletes
+	//tweet
 ];
 

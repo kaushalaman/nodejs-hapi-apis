@@ -11,10 +11,13 @@
   "dependencies": {
     "async": "^2.0.0-rc.6",
     "bcrypt": "^0.8.6",
+    "boom": "^3.2.1",
+    "glob": "^7.0.3",
     "good": "^7.0.1",
     "good-console": "^6.1.2",
     "good-squeeze": "^3.0.1",
     "hapi": "^13.4.1",
+    "hapi-auth-jwt": "^4.0.0",
     "hapi-swagger": "^6.1.0",
     "inert": "^4.0.0",
     "joi": "^8.4.2",

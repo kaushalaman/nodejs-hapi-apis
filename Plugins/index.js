@@ -5,5 +5,6 @@ module.exports = [
  Inert,
  Vision,
  {register : require('./swagger')},
- {register: require('./good-console')}
+ {register: require('./good-console')},
+ {register: require('./hapi-auth-jwt')}
 ];
