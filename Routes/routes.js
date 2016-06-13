@@ -53,47 +53,68 @@ var login = {
 	},
 	handler:function(request,reply)
 	{
-		User.findOne({$or: [{email:request.payload.id},{username:request.payload.id}]},function(err,user){
+		async.waterfall(
+		[
+			function(callback){
+				User.findOne({$or: [{email:request.payload.id},{username:request.payload.id}]},function(err,user){
 			
-			if(err)
-				throw err;
-			if(!user)
-			{
-				reply({
-					statuscode:200,
-					message:'User not found'
-				});
-			}
-			else
-			{
-
-				user.comparePassword(request.payload.password,function(err,isMatch){
+					if(err)
+						throw err;
+					if(!user)
+					{
+						callback(null,200);
+						/*reply({
+							statuscode:200,
+							message:'User not found'
+						});*/
+					}
+					else{
+						callback(null, user);
+					}
 					
+				});
+			},
+			function(arg,callback){
+				if(arg===200){
+					callback(null, 'User not found');
+				}
+				else{
+					arg.comparePassword(request.payload.password,function(err,isMatch){
 					if(err)
 						throw err;
 					else if(isMatch)
 					{
-						reply({
-							statusCode:200,
-							message:'Login Successful',
-							res:isMatch,
-							data:"Welcome "+request.payload.id
-						})
+						callback(null, isMatch);
 					}
 					else{
-						reply({
-							message:'Login Failed',
-							res:isMatch,
-							data:"Sorry "
-						})
+						callback(null, isMatch);
 					}
-				});
+				}
+				);
+				}				
+			
 			}
-		});
-					
+		], function(err,res){
+			if(res){
+				reply({
+							statusCode:200,
+							message:'Login Successful',
+							result:res
+							//data:"Welcome "+request.payload.id
+						});
+				}
+			else{
+				reply({
+							message:'Login Failed',
+							result:res,
+							data:"Sorry "
+						});
+				}
+		    }
+
+	);					
 	}
-	
-}
+};
 
 var register = {
 	method:'POST', 
