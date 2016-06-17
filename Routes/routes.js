@@ -265,7 +265,6 @@ var tweet = {
 				throw err;
 			}
 			else{
-				//console.log(user);
 				var names = user.names;
 				console.log("1",names);
 				callback(null,names);
@@ -297,7 +296,7 @@ var tweet = {
 			else if(res == 503){
 				reply({
 					statusCode: 503,
-					message: 'Problem in insertinf in tweet',
+					message: 'Problem in inserting in tweet',
 					data: err
 				});
 			}
@@ -307,14 +306,91 @@ var tweet = {
 					message: 'Tweet Inserted'
 				});
 			}
-		});
-		
-	
-
-		
+		});		
 	}
-} 
+};
 
+// Get All Tweets 
+var getAllTweets =  {
+				method:'GET',
+				path: '/twitter/api/getAllTweets',
+				config:{
+					tags:['api'],
+					description:'Get All tweets',
+					notes:'Get All Tweet',
+					validate:{
+						headers: authorizeHeaderObject,
+					},
+					auth: 'token'
+				},
+				handler: function(req, rep){
+						async.waterfall([function(callback){
+							Tweet.find(function(err,res){
+								if(err){
+									throw err;
+								}
+								else{
+									callback(null,res);
+								}
+							});
+						}, function(res,callback){
+							callback(null,res);
+						}],function(err,res){
+							if(err){
+								throw err;
+							}
+							else{
+								rep(res);
+							}
+						});
+				}
+
+};
+
+// Get User Tweets
+var getUserTweets =  {
+				method:'GET',
+				path: '/twitter/api/getUserTweets',
+				config:{
+					tags:['api'],
+					description:'Get User tweets',
+					notes:'Get User Tweet',
+					validate:{
+						headers: authorizeHeaderObject,
+
+					},
+					auth: 'token'
+				},
+				handler: function(request, reply){
+					let token = jwtDecode(request.headers.authorization);
+						async.waterfall([function(callback){
+							Tweet.find({username:token.id},function(err,res){
+								if(err){
+									throw err;
+								}
+								else{
+									callback(null,res);
+								}
+							});
+						}, function(res,callback){
+							callback(null,res);
+						}],function(err,res){
+							if(err){
+								throw err;
+							}
+							else{
+								var arr=[];
+
+								for(var i=0;i<res.length;i++){
+									console.log(res[i].tweet_text)
+									arr.push(res[i].tweet_text);
+								}
+								reply({'tweets':arr});
+							}
+						});
+				}
+
+};
 
 module.exports = [
 	get,
@@ -322,6 +398,8 @@ module.exports = [
 	register,
 	logout,
 	deletes,
-	tweet
+	tweet,
+	getAllTweets,
+	getUserTweets
 ];
 
