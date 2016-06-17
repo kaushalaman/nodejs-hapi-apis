@@ -3,5 +3,6 @@
 module.exports = {
 	CONSTANTS: require('./constants'),
 	serverConfig: require('./serverConfig'),
-	dbConfig:require('./dbConfig')
+	dbConfig:require('./dbConfig'),
+	jwtSecret:require('./jwtSecret.js')
 }

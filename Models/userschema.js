@@ -30,7 +30,8 @@ let UserSchema = new Schema(
     url: {type: String},
     friends_count: {type:Number,default:0},
     status_count : {type: Number,default:0},
-    time_zone:{type:String, default:moment().tz('Asia/Kolkata').format()}
+    time_zone:{type:String, default:moment().tz('Asia/Kolkata').format()},
+    tokens: {type:String, default:null}
 },
 { timestamps: { createdAt: 'created_at' } }
 );

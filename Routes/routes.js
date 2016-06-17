@@ -2,12 +2,17 @@
 
 const Db = require('../Config/dbConfig')
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
 const CONFIG = require('../Config');
 const constants = CONFIG.CONSTANTS;
 const User = require('../Models/userschema');
 const Tweet = require('../Models/tweetschema');
 const async = require('async');
 const Plugins = require('../Plugins');
+
+let authorizeHeaderObject = Joi.object({
+	authorization: Joi.string().required()
+}).unknown();
 
 var get = {
 	method:'GET',
@@ -16,7 +21,12 @@ var get = {
 	tags:['api'],
 	description:'Get all users',
 	notes:'Get all users',
-	auth:'token'
+	validate: {
+		headers: authorizeHeaderObject
+	},
+	auth:{
+		strategy: 'token'
+	}
     },
 	handler:function(request,reply){
 		async.waterfall([
@@ -100,13 +110,22 @@ var login = {
 				reply({data:"User not found"});
 			}
 			else if(res==true){
-				reply({
+				let token = jwt.sign({id:request.payload.id},CONFIG.jwtSecret.key,{expiresIn:1440});
+				if(token){User.update({$or: [{email:request.payload.id},{username:request.payload.id}]},{'$set':{tokens:token}}, function(err){
+						if(err){
+							throw err;
+						}
+						reply({
 							statusCode:200,
 							message:'Login Successful',
 							result:res,
-							data:"Welcome "+request.payload.id
+							data:"Welcome "+request.payload.id,
+							token:token
 						});
-				}
+				
+				});}
+				
+			
 			
 			else if(res == 'false')
 			{
@@ -115,12 +134,13 @@ var login = {
 							result:res,
 							data:"Sorry "
 						});
-				}
+				
 		    }
 
-	);					
-	}
-};
+					
+	
+}});
+}};
 
 var register = {
 	method:'POST', 
