@@ -9,6 +9,7 @@ const User = require('../Models/userschema');
 const Tweet = require('../Models/tweetschema');
 const async = require('async');
 const Plugins = require('../Plugins');
+const jwtDecode = require('jwt-decode');
 
 let authorizeHeaderObject = Joi.object({
 	authorization: Joi.string().required()
@@ -238,7 +239,9 @@ var deletes = {
 	
 };
 
-/*var tweet = {
+
+// Post tweet
+var tweet = {
 	method: 'POST',
 	path:'/twitter/api/post',
 	config:{
@@ -246,33 +249,79 @@ var deletes = {
 		description:'Post tweet',
 		notes:'Post Tweet',
 		validate:{
+			headers: authorizeHeaderObject,
 			payload:{
 				text: Joi.string().required(),
-				id: Joi.number(),
-				username : Joi.string(),
-				name : Joi.string()
 			}
-		}
+		},
+		auth: 'token'
 	},
 	handler : function(request, reply){
-		let tweet = new Tweet({
-			tweet:request.payload.text,
-			tweet_id:request.payload.id,
-			username:request.payload.username,
-			name: request.payload.name
+		let token = jwtDecode(request.headers.authorization);
+		console.log('token',token);
+		async.waterfall([function(callback){
+			User.findOne({username:token.id},function(err, user){
+			if(err){
+				throw err;
+			}
+			else{
+				//console.log(user);
+				var names = user.names;
+				console.log("1",names);
+				callback(null,names);
+			}
 		});
-		tweet.save(tweet, function(err,res){
+		}, function(res, callback){
+			console.log("res",res);
+			let tweet = new Tweet({
+			tweet_text:request.payload.text,
+			username: token.id,
+			name: res
 
-		})
+		});
+
+		tweet.save(tweet, function(err){
+			if(err)
+			{	
+				callback(null,503);
+			}
+			else{
+				callback(null,200);
+			}
+		});
+		}
+		],function(err,res){
+			if(err){
+				throw err;
+			}
+			else if(res == 503){
+				reply({
+					statusCode: 503,
+					message: 'Problem in insertinf in tweet',
+					data: err
+				});
+			}
+			else if(res==200){
+				reply({
+					statusCode:200,
+					message: 'Tweet Inserted'
+				});
+			}
+		});
+		
+	
+
+		
 	}
-} */
+} 
+
 
 module.exports = [
 	get,
 	login,
 	register,
 	logout,
-	deletes
-	//tweet
+	deletes,
+	tweet
 ];
 

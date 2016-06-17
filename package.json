@@ -11,6 +11,7 @@
   "dependencies": {
     "async": "^2.0.0-rc.6",
     "bcrypt": "^0.8.6",
+    "bell": "^7.8.0",
     "boom": "^3.2.1",
     "glob": "^7.0.3",
     "good": "^7.0.1",
@@ -23,10 +24,13 @@
     "inert": "^4.0.0",
     "joi": "^8.4.2",
     "jsonwebtoken": "^7.0.1",
+    "jwt-decode": "^2.0.1",
     "log4js": "^0.6.36",
     "moment": "^2.13.0",
     "moment-timezone": "^0.5.4",
     "mongoose": "^4.4.20",
+    "mongoose-sequence": "^3.0.2",
+    "otp.js": "^1.1.0",
     "vision": "^4.1.0"
   }
 }
