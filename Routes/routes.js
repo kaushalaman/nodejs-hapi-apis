@@ -469,6 +469,62 @@ var Unfollow = {
 
 };
 
+//Count Number of followers
+var numberFollowers = {
+				method:'GET',
+				path:'/twitter/api/countFollowers',
+				config:{
+					tags:['api'],
+					description:'Count your followers',
+					notes:'Count your followers',
+					validate:{
+						headers: authorizeHeaderObject,
+						
+					},
+					auth: 'token'
+				},
+				handler: function(request, reply){
+					let token = jwtDecode(request.headers.authorization);
+					User.find({username:token.id},function(err, res){
+						if(err){
+							throw err;
+						}
+						else{
+							reply("Number of Followers: "+res[0].followers.length);
+						}
+					})
+				}
+
+};
+
+//Count Number of followings
+var numberFollowing = {
+				method:'GET',
+				path:'/twitter/api/countFollowing',
+				config:{
+					tags:['api'],
+					description:'Count your followers',
+					notes:'Count your followers',
+					validate:{
+						headers: authorizeHeaderObject,
+						
+					},
+					auth: 'token'
+				},
+				handler: function(request, reply){
+					let token = jwtDecode(request.headers.authorization);
+					User.find({username:token.id},function(err, res){
+						if(err){
+							throw err;
+						}
+						else{
+							reply("Number of Followings: "+res[0].following.length);
+						}
+					})
+				}
+
+};
+
 module.exports = [
 	get,
 	login,
@@ -479,6 +535,8 @@ module.exports = [
 	getAllTweets,
 	getUserTweets,
 	following,
-	Unfollow
+	Unfollow,
+	numberFollowers,
+	numberFollowing
 ];
 
