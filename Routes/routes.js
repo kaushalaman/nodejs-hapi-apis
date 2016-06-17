@@ -392,6 +392,7 @@ var getUserTweets =  {
 
 };
 
+// Follow users
 var following = {
 		method:'POST',
 		path: '/twitter/api/following',
@@ -427,6 +428,47 @@ var following = {
 		}
 };
 
+//Unfollow user
+
+var Unfollow = {
+	method: 'POST',
+	path: '/twitter/api/unfollow',
+	config:{
+					tags:['api'],
+					description:'Unfollow User',
+					notes:'Unfollow User',
+					validate:{
+						headers: authorizeHeaderObject,
+						payload:{
+							id: Joi.string().required()
+						}
+
+					},
+					auth: 'token'
+				},
+			handler: function(request, reply){
+				let token = jwtDecode(request.headers.authorization);
+				var unfollower = token.id;
+				var unfollowed = request.payload.id;
+
+				User.update({username:unfollower},{'$pullAll': {following:[unfollowed]}}, function(err, res){
+					if(err){
+						throw err;
+					}
+					else{
+						User.update({username:unfollowed},{'$pullAll':{followers:[unfollower]}},function(err, res){
+							if(err){
+								throw err;
+							}
+							reply('Successfully Unfollowed');
+						});
+					}
+				});
+
+			}
+
+};
+
 module.exports = [
 	get,
 	login,
@@ -436,6 +478,7 @@ module.exports = [
 	tweet,
 	getAllTweets,
 	getUserTweets,
-	following
+	following,
+	Unfollow
 ];
 

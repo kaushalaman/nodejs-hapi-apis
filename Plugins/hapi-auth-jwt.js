@@ -5,7 +5,7 @@ const config = require('../Config');
 
 function validate(decodedToken,request,callback){
 
-	console.log(decodedToken);
+	//console.log(decodedToken);
 
 	User.findOne({username:decodedToken.id},function(err,user){
 		
@@ -15,7 +15,7 @@ function validate(decodedToken,request,callback){
 
 		let error,credentials = user.username || {};
 	
-		console.log(credentials);
+		//console.log(credentials);
 		if(!credentials)
 			callback(null,false,credentials);
 		callback(null,true,credentials);
@@ -28,7 +28,7 @@ exports.register = function(server, options, next){
 
 console.log(0);
     server.register(require('hapi-auth-jwt2'),(err)=>{
-			console.log(1);
+			//console.log(1);
 	server.auth.strategy('token','jwt',{
 	    
 			key : config.jwtSecret.key,
