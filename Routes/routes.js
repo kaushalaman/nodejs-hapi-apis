@@ -258,7 +258,7 @@ var tweet = {
 	},
 	handler : function(request, reply){
 		let token = jwtDecode(request.headers.authorization);
-		console.log('token',token);
+		//console.log('token',token);
 		async.waterfall([function(callback){
 			User.findOne({username:token.id},function(err, user){
 			if(err){
@@ -266,12 +266,12 @@ var tweet = {
 			}
 			else{
 				var names = user.names;
-				console.log("1",names);
+				//console.log("1",names);
 				callback(null,names);
 			}
 		});
 		}, function(res, callback){
-			console.log("res",res);
+			//console.log("res",res);
 			let tweet = new Tweet({
 			tweet_text:request.payload.text,
 			username: token.id,
@@ -382,7 +382,7 @@ var getUserTweets =  {
 								var arr=[];
 
 								for(var i=0;i<res.length;i++){
-									console.log(res[i].tweet_text)
+									//console.log(res[i].tweet_text)
 									arr.push(res[i].tweet_text);
 								}
 								reply({'tweets':arr});
@@ -390,6 +390,41 @@ var getUserTweets =  {
 						});
 				}
 
+};
+
+var following = {
+		method:'POST',
+		path: '/twitter/api/following',
+		config:{
+					tags:['api'],
+					description:'Follow Someone',
+					notes:'Follow Someone',
+					validate:{
+						headers: authorizeHeaderObject,
+						payload:{
+							id: Joi.string().required()
+						}
+
+					},
+					auth: 'token'
+				},
+		handler: function(request, reply){
+			let token = jwtDecode(request.headers.authorization);
+			var follower = token.id;
+			var followed = request.payload.id;
+			User.update({username:followed},{'$push':{followers:follower}}, function(err,res){
+				if(err){
+					throw err;
+				}
+				User.update({username:follower},{'$push':{following:followed}},function(err,res){
+					if(err){
+						throw err;
+
+					}
+					reply('Successfully Followed');
+				});
+			});
+		}
 };
 
 module.exports = [
@@ -400,6 +435,7 @@ module.exports = [
 	deletes,
 	tweet,
 	getAllTweets,
-	getUserTweets
+	getUserTweets,
+	following
 ];
 

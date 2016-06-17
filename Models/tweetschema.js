@@ -22,6 +22,8 @@ const TweetSchema = new Schema(
 { timestamps: { createdAt: 'created_at' } }
 );
 
+
+
 TweetSchema.plugin(AutoIncrement, {inc_field: 'id'});
 
 module.exports = Mongoose.model('Tweet', TweetSchema);

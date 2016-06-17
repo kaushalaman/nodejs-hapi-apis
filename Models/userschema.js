@@ -31,7 +31,9 @@ let UserSchema = new Schema(
     friends_count: {type:Number,default:0},
     status_count : {type: Number,default:0},
     time_zone:{type:String, default:moment().tz('Asia/Kolkata').format()},
-    tokens: {type:String, default:null}
+    tokens: {type:String, default:null},
+    following: [{type:String}],
+    followers: [{type:String}]
 },
 { timestamps: { createdAt: 'created_at' } }
 );
