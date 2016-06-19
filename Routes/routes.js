@@ -110,6 +110,15 @@ var login = {
 			if(res===2){
 				reply({data:"User not found"});
 			}
+			else if(res == 'false')
+			{
+				reply({
+							message:'Login Failed',
+							result:res,
+							data:"Sorry "
+						});
+				
+		    }
 			else if(res==true){
 				let token = jwt.sign({id:request.payload.id},CONFIG.jwtSecret.key,{expiresIn:1440});
 				if(token){User.update({$or: [{email:request.payload.id},{username:request.payload.id}]},{'$set':{tokens:token}}, function(err){
@@ -128,15 +137,7 @@ var login = {
 				
 			
 			
-			else if(res == 'false')
-			{
-				reply({
-							message:'Login Failed',
-							result:res,
-							data:"Sorry "
-						});
-				
-		    }
+			
 
 					
 	
@@ -413,18 +414,48 @@ var following = {
 			let token = jwtDecode(request.headers.authorization);
 			var follower = token.id;
 			var followed = request.payload.id;
-			User.update({username:followed},{'$push':{followers:follower}}, function(err,res){
+			User.find({username:followed},function(err,res){
 				if(err){
 					throw err;
 				}
-				User.update({username:follower},{'$push':{following:followed}},function(err,res){
-					if(err){
-						throw err;
+				else{
+					//console.log(res.length);
+					if(res.length===0){
+						reply('User does not exit');
+						//process.exit(1);
+					}
+					else{
+						User.find({username:token.id},function(err,res){
+				if(err){
+					throw err
+				}
+				else{
+					if(res[0].following.indexOf(followed)!=-1){
+						reply('You already follow this user');
+					}
+					else{
+						User.update({username:followed},{'$push':{followers:follower}}, function(err,res){
+						if(err){
+							throw err;
+						}
+						console.log('res',res);
+						User.update({username:follower},{'$push':{following:followed}},function(err,res){
+						if(err){
+							throw err;
+						}
+						reply('Successfully Followed');
+						});
+						});
+					}
+
+				}
+			});
 
 					}
-					reply('Successfully Followed');
-				});
+				}
 			});
+			
+			
 		}
 };
 
@@ -520,11 +551,79 @@ var numberFollowing = {
 						else{
 							reply("Number of Followings: "+res[0].following.length);
 						}
-					})
+					});
 				}
 
 };
+// Get followers of user
+var getFollowers = {
 
+			method: 'GET',
+			path : '/twitter/api/getFollowers',
+			config:{
+					tags:['api'],
+					description:'Get your followers',
+					notes:'Get your followers',
+					validate:{
+						headers: authorizeHeaderObject,
+						
+					},
+					auth: 'token'
+				},
+			handler: function(request, reply){
+				let token = jwtDecode(request.headers.authorization);
+				User.find({username:token.id},function(err,res){
+					if(err){
+						throw err;
+					}
+					else{
+						User.find({username:{'$in':res[0].followers}}, function(err, result){
+							if(err){
+								throw err;
+							}
+							else{
+								reply(result);
+							}
+						});
+					}
+				});
+			}
+};
+
+// get followings of a user
+var getFollowings = {
+
+			method: 'GET',
+			path : '/twitter/api/getFollowings',
+			config:{
+					tags:['api'],
+					description:'Get your followings',
+					notes:'Get your followings',
+					validate:{
+						headers: authorizeHeaderObject,
+						
+					},
+					auth: 'token'
+				},
+			handler: function(request, reply){
+				let token = jwtDecode(request.headers.authorization);
+				User.find({username:token.id},function(err,res){
+					if(err){
+						throw err;
+					}
+					else{
+						User.find({username:{'$in':res[0].following}}, function(err, result){
+							if(err){
+								throw err;
+							}
+							else{
+								reply(result);
+							}
+						});
+					}
+				});
+			}
+};
 module.exports = [
 	get,
 	login,
@@ -537,6 +636,8 @@ module.exports = [
 	following,
 	Unfollow,
 	numberFollowers,
-	numberFollowing
+	numberFollowing,
+	getFollowers,
+	getFollowings
 ];
 
